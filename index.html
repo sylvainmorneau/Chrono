@@ -3,52 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chrono Pro - Visibilité Maximale</title>
+    <title>Chrono Tactile Pro</title>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: #000000; color: #ffffff; margin: 0; padding: 10px 15px 25px 15px; }
-        .header { text-align: center; font-size: 0.8rem; color: #333; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+        .header { text-align: center; font-size: 0.8rem; color: #333; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; pointer-events: none; }
         
-        /* ZONE CENTRALE : TAILLE MAXIMALE */
-        .display-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; }
-        .total-label { font-size: 1rem; color: #8e8e93; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
-        .time-display { font-size: 2.6rem; font-weight: 500; font-variant-numeric: tabular-nums; color: #aeaea2; margin-bottom: 5px; }
-        .lap-label { font-size: 1.6rem; color: #34c759; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; height: 28px; }
-        .lap-display { font-size: 8.5rem; color: #34c759; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: -4px; height: 150px; display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease; }
+        /* ZONE DE PRESSION PLEIN ÉCRAN POUR ENREGISTRER UN TOUR */
+        .tap-zone { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; cursor: pointer; }
+        
+        .total-label { font-size: 1rem; color: #8e8e93; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; pointer-events: none; }
+        .time-display { font-size: 2.6rem; font-weight: 500; font-variant-numeric: tabular-nums; color: #aeaea2; margin-bottom: 5px; pointer-events: none; }
+        
+        /* NOUVEAU DESIGN BLANC ÉPURÉ ET GÉANT */
+        .lap-label { font-size: 4rem; color: #ffffff; font-weight: 900; height: 70px; pointer-events: none; transition: opacity 0.3s ease; }
+        .lap-display { font-size: 8.5rem; color: #ffffff; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: -4px; height: 150px; display: flex; align-items: center; justify-content: center; pointer-events: none; transition: opacity 0.3s ease; }
         .lap-display.hidden, .lap-label.hidden { opacity: 0; }
         
-        /* HISTORIQUE COMPACT ULTRA-MINCE */
+        /* HISTORIQUE COMPACT */
         .history-container { height: 75px; width: 100%; max-width: 500px; margin: 5px auto; background-color: #1c1c1e; border-radius: 12px; padding: 6px 12px; overflow-y: auto; border: 1px solid #2c2c2e; }
         .history-title-row { display: flex; justify-content: space-between; padding-bottom: 3px; border-bottom: 1px solid #2c2c2e; font-size: 0.7rem; color: #8e8e93; font-weight: 600; text-transform: uppercase; }
         .lap-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #2c2c2e; font-variant-numeric: tabular-nums; font-size: 0.95rem; }
         .lap-row:last-child { border-bottom: none; }
-        .lap-row .lap-num { color: #666; font-weight: 600; }
-        .lap-row .lap-time { color: #34c759; font-weight: 600; }
+        .lap-row .lap-num { color: #8e8e93; font-weight: 600; }
+        .lap-row .lap-time { color: #ffffff; font-weight: 600; }
         .lap-row .lap-total { color: #aeaea2; }
 
-        /* BOUTONS GÉANTS BAS DE PAGE */
+        /* BLOC DES BOUTONS DE CONTRÔLE DE BAS DE PAGE */
         .controls-container { width: 100%; max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
         .buttons-row { display: flex; gap: 15px; }
         .btn { flex: 1; height: 95px; border-radius: 18px; font-size: 1.7rem; font-weight: 900; text-transform: uppercase; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6); transition: background-color 0.1s ease, transform 0.05s ease; }
         .btn:active { transform: scale(0.95); }
-        #lap-btn { background-color: #f2f2f7; color: #000000; }
-        #lap-btn.reset-mode { background-color: #ff9500; color: #ffffff; }
-        #lap-btn:disabled { background-color: #2c2c2e; color: #48484a; box-shadow: none; opacity: 0.4; }
+        
         #start-btn { background-color: #34c759; color: #000000; }
         #start-btn.running { background-color: #ff3b30; color: #ffffff; }
+        
+        #reset-btn { background-color: #ff9500; color: #ffffff; display: none; } /* Caché par défaut, visible à l'arrêt */
+        
         .export-btn { width: 100%; height: 48px; background-color: #007aff; color: #ffffff; border: none; border-radius: 12px; font-size: 1.05rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; text-transform: uppercase; letter-spacing: 0.5px; }
         .export-btn:disabled { background-color: #2c2c2e; color: #48484a; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-    <div class="header">Chrono Vision</div>
+    <div class="header">Chrono Tactile Pro</div>
 
-    <div class="display-container">
+    <!-- Tout cet écran central capte désormais la commande "Tour" -->
+    <div id="tap-zone" class="tap-zone">
         <div class="total-label">Temps Total</div>
         <div id="chrono" class="time-display">00:00:00.00</div>
         
-        <div id="lap-title" class="lap-label hidden">Tour 1</div>
+        <div id="lap-title" class="lap-label hidden">#1</div>
         <div id="lap-zone" class="lap-display hidden">00.00</div>
     </div>
 
@@ -59,7 +64,7 @@
 
     <div class="controls-container">
         <div class="buttons-row">
-            <button id="lap-btn" class="btn" disabled>Tour</button>
+            <button id="reset-btn" class="btn">Effacer</button>
             <button id="start-btn" class="btn">Démarrer</button>
         </div>
         <button id="export-btn" class="export-btn" disabled>Exporter en CSV</button>
@@ -68,7 +73,15 @@
 <script>
     let startTime = 0, elapsedTime = 0, timeAtLastLap = 0, timerInterval = null;
     let isRunning = false, timeoutId = null, lapCount = 0, lapHistory = [];
-    const chronoDisplay = document.getElementById('chrono'), lapTitleDisplay = document.getElementById('lap-title'), lapZoneDisplay = document.getElementById('lap-zone'), startBtn = document.getElementById('start-btn'), lapBtn = document.getElementById('lap-btn'), exportBtn = document.getElementById('export-btn'), historyList = document.getElementById('history-list');
+    
+    const tapZone = document.getElementById('tap-zone');
+    const chronoDisplay = document.getElementById('chrono');
+    const lapTitleDisplay = document.getElementById('lap-title');
+    const lapZoneDisplay = document.getElementById('lap-zone');
+    const startBtn = document.getElementById('start-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const exportBtn = document.getElementById('export-btn');
+    const historyList = document.getElementById('history-list');
 
     function formatLapTime(timeInMs) {
         const ms = timeInMs % 1000, centiseconds = Math.floor(ms / 10).toString().padStart(2, '0');
@@ -85,32 +98,58 @@
 
     function updateChrono() { elapsedTime = Date.now() - startTime; chronoDisplay.textContent = formatTotalTime(elapsedTime); }
 
+    // GESTION DU TAP PLEIN ÉCRAN (ACTION : TOUR)
+    tapZone.addEventListener('click', () => {
+        if (!isRunning) return; // Ne fait rien au clic sur l'écran si le chrono n'est pas démarré
+        
+        lapCount++; 
+        const currentLapTime = elapsedTime - timeAtLastLap;
+        const lapTimeStr = formatLapTime(currentLapTime);
+        const totalTimeStr = formatTotalTime(elapsedTime);
+        timeAtLastLap = elapsedTime; 
+        
+        // Affichage flash blanc
+        lapTitleDisplay.textContent = `#${lapCount}`; 
+        lapZoneDisplay.textContent = lapTimeStr;
+        
+        lapTitleDisplay.classList.remove('hidden'); 
+        lapZoneDisplay.classList.remove('hidden');
+        
+        clearTimeout(timeoutId); 
+        timeoutId = setTimeout(() => { lapTitleDisplay.classList.add('hidden'); lapZoneDisplay.classList.add('hidden'); }, 10000);
+        
+        // Ajout historique
+        lapHistory.unshift({ num: lapCount, lapTime: lapTimeStr, totalTime: totalTimeStr });
+        const row = document.createElement('div'); row.className = 'lap-row';
+        row.innerHTML = `<span class="lap-num">#${lapCount}</span><span class="lap-time">${lapTimeStr}</span><span class="lap-total">${totalTimeStr}</span>`;
+        historyList.insertBefore(row, historyList.firstChild); 
+        exportBtn.disabled = false;
+    });
+
+    // BOUTON PRINCIPAL : DÉMARRER / ARRÊTER
     startBtn.addEventListener('click', () => {
         if (!isRunning) {
             startTime = Date.now() - elapsedTime; timeAtLastLap = elapsedTime; timerInterval = setInterval(updateChrono, 10);
-            startBtn.textContent = "Arrêter"; startBtn.classList.add('running'); lapBtn.textContent = "Tour"; lapBtn.classList.remove('reset-mode'); lapBtn.disabled = false; isRunning = true;
+            startBtn.textContent = "Arrêter"; startBtn.classList.add('running');
+            resetBtn.style.display = "none"; // Cache le bouton effacer pendant la course
+            isRunning = true;
         } else {
-            clearInterval(timerInterval); startBtn.textContent = "Reprendre"; startBtn.classList.remove('running'); lapBtn.textContent = "Effacer"; lapBtn.classList.add('reset-mode'); isRunning = false;
+            clearInterval(timerInterval); startBtn.textContent = "Reprendre"; startBtn.classList.remove('running');
+            resetBtn.style.display = "block"; // Affiche le bouton effacer à l'arrêt
+            isRunning = false;
         }
     });
 
-    lapBtn.addEventListener('click', () => {
-        if (isRunning) {
-            lapCount++; const currentLapTime = elapsedTime - timeAtLastLap, lapTimeStr = formatLapTime(currentLapTime), totalTimeStr = formatTotalTime(elapsedTime);
-            timeAtLastLap = elapsedTime; lapTitleDisplay.textContent = `Tour ${lapCount}`; lapZoneDisplay.textContent = lapTimeStr;
-            lapTitleDisplay.classList.remove('hidden'); lapZoneDisplay.classList.remove('hidden');
-            clearTimeout(timeoutId); timeoutId = setTimeout(() => { lapTitleDisplay.classList.add('hidden'); lapZoneDisplay.classList.add('hidden'); }, 10000);
-            lapHistory.unshift({ num: lapCount, lapTime: lapTimeStr, totalTime: totalTimeStr });
-            const row = document.createElement('div'); row.className = 'lap-row';
-            row.innerHTML = `<span class="lap-num">#${lapCount}</span><span class="lap-time">${lapTimeStr}</span><span class="lap-total">${totalTimeStr}</span>`;
-            historyList.insertBefore(row, historyList.firstChild); exportBtn.disabled = false;
-        } else {
-            clearInterval(timerInterval); elapsedTime = 0; timeAtLastLap = 0; lapCount = 0; lapHistory = [];
-            chronoDisplay.textContent = "00:00:00.00"; lapTitleDisplay.classList.add('hidden'); lapZoneDisplay.classList.add('hidden'); historyList.innerHTML = '';
-            startBtn.textContent = "Démarrer"; lapBtn.textContent = "Tour"; lapBtn.classList.remove('reset-mode'); lapBtn.disabled = true; exportBtn.disabled = true;
-        }
+    // BOUTON EFFACER (RESET)
+    resetBtn.addEventListener('click', () => {
+        clearInterval(timerInterval); elapsedTime = 0; timeAtLastLap = 0; lapCount = 0; lapHistory = [];
+        chronoDisplay.textContent = "00:00:00.00"; lapTitleDisplay.classList.add('hidden'); lapZoneDisplay.classList.add('hidden'); historyList.innerHTML = '';
+        startBtn.textContent = "Démarrer";
+        resetBtn.style.display = "none";
+        exportBtn.disabled = true;
     });
 
+    // EXPORTATION CSV
     exportBtn.addEventListener('click', () => {
         if (lapHistory.length === 0) return;
         let csvContent = "Tour;Temps du Tour;Temps Cumule\n";
